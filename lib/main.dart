@@ -38,6 +38,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     controller1 = GifController(vsync: this);
+    controller1.duration = const Duration(milliseconds: 3600);
+    controller1.forward();
     controller2 = GifController(vsync: this);
     controller3 = GifController(vsync: this);
     controller4 = GifController(vsync: this);
