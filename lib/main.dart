@@ -5,49 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_demos/custom_circle/custom_circle_page.dart';
 import 'package:flutter_demos/nav_bttom_gif/nav_bottom_gif.dart';
+import 'package:flutter_demos/push_notification/push_notification_service.dart';
 import 'package:flutter_demos/silver_persistent_header/silver_persistent_header.dart';
 import 'package:flutter_demos/slider/custom_slider_page.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  print('Handling a background message ${message.messageId}');
-}
-
-/// Create a [AndroidNotificationChannel] for heads up notifications
-late AndroidNotificationChannel channel;
-
-/// Initialize the [FlutterLocalNotificationsPlugin] package.
-late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  PushNotificationService.onBackgroundMessage();
+  PushNotificationService.getChannel();
 
-  if (!kIsWeb) {
-    channel = const AndroidNotificationChannel(
-      'high_importance_channel', // id
-      'High Importance Notifications', // title
-      description:
-          'This channel is used for important notifications.', // description
-      importance: Importance.high,
-    );
-
-    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
-
-    await FirebaseMessaging.instance
-        .setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-  }
   runApp(const MyApp());
 }
 
@@ -62,28 +29,9 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      RemoteNotification? notification = message.notification;
-      AndroidNotification? android = message.notification?.android;
-      if (notification != null && android != null && !kIsWeb) {
-        flutterLocalNotificationsPlugin.show(
-          notification.hashCode,
-          notification.title,
-          notification.body,
-          NotificationDetails(
-            android: AndroidNotificationDetails(
-              channel.id,
-              channel.name,
-              channelDescription: channel.description,
-              // TODO add a proper drawable resource to android, for now using
-              //      one that already exists in example app.
-              icon: 'launch_background',
-            ),
-          ),
-        );
-      }
-    });
-    getToken();
+    PushNotificationService.instance.getInitialMessage();
+    PushNotificationService.instance.initialise();
+    PushNotificationService.instance.getToken();
   }
 
   getToken() async {
