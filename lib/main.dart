@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_demos/custom_circle/custom_circle_page.dart';
 import 'package:flutter_demos/nav_bttom_gif/nav_bottom_gif.dart';
+import 'package:flutter_demos/push_notification/push_notification_page.dart';
 import 'package:flutter_demos/push_notification/push_notification_service.dart';
 import 'package:flutter_demos/silver_persistent_header/silver_persistent_header.dart';
 import 'package:flutter_demos/slider/custom_slider_page.dart';
@@ -29,9 +30,28 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    PushNotificationService.instance.getInitialMessage();
+    PushNotificationService.instance.getInitialMessage((message) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return PushNotificationPage(message: message);
+          },
+        ),
+      );
+    });
     PushNotificationService.instance.initialise();
     PushNotificationService.instance.getToken();
+    PushNotificationService.onMessageOpenedApp((message) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return PushNotificationPage(message: message);
+          },
+        ),
+      );
+    });
   }
 
   getToken() async {
@@ -119,6 +139,12 @@ class _MyHomePageState extends State<MyHomePage> {
             context: context,
             icon: Icons.vignette_rounded,
             page: const CustomCirclePage(),
+          ),
+          // google消息推送
+          _buildListItem(
+            context: context,
+            icon: Icons.announcement_sharp,
+            page: const PushNotificationPage(),
           ),
         ],
       ),

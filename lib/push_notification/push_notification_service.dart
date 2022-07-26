@@ -52,14 +52,6 @@ class PushNotificationService {
     }
   }
 
-  getInitialMessage() {
-    _messaging.getInitialMessage().then((RemoteMessage? message) {
-      if (message != null) {
-        print('getInitialMessage: $message');
-      }
-    });
-  }
-
   Future getToken() async {
     String? token = await _messaging.getToken();
     if (kDebugMode) {
@@ -78,7 +70,9 @@ class PushNotificationService {
       provisional: false,
       sound: true,
     );
+    print('settings: ${settings.authorizationStatus}');
 
+    // 监听消息和设置消息的样式
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification? notification = message.notification;
       print('notification: ${notification}');
@@ -99,6 +93,20 @@ class PushNotificationService {
         );
       }
     });
-    print('settings: ${settings.authorizationStatus}');
+  }
+
+  getInitialMessage(Function(RemoteMessage) callback) {
+    _messaging.getInitialMessage().then((RemoteMessage? message) {
+      if (message != null) {
+        callback.call(message);
+      }
+    });
+  }
+
+  static onMessageOpenedApp(Function(RemoteMessage) callback) {
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('onMessageOpenedApp: $message');
+      callback.call(message);
+    });
   }
 }
