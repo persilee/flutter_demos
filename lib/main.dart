@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_demos/custom_circle/custom_circle_page.dart';
+import 'package:flutter_demos/local_drag_icon/local_drag_icon.dart';
 import 'package:flutter_demos/nav_bttom_gif/nav_bottom_gif.dart';
 import 'package:flutter_demos/push_notification/push_notification_page.dart';
 import 'package:flutter_demos/push_notification/push_notification_service.dart';
@@ -145,6 +146,12 @@ class _MyHomePageState extends State<MyHomePage> {
             context: context,
             icon: Icons.announcement_sharp,
             page: const PushNotificationPage(),
+          ),
+          // 本地存储的可拖拽的图标
+          _buildListItem(
+            context: context,
+            icon: Icons.image_aspect_ratio,
+            page: const LocalDragIcon(),
           ),
         ],
       ),
