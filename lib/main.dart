@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_demos/custom_circle/custom_circle_page.dart';
+import 'package:flutter_demos/local_auth/local_auth_page.dart';
 import 'package:flutter_demos/nav_bttom_gif/nav_bottom_gif.dart';
 import 'package:flutter_demos/push_notification/push_notification_page.dart';
 import 'package:flutter_demos/push_notification/push_notification_service.dart';
@@ -30,28 +31,9 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    PushNotificationService.instance.getInitialMessage((message) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) {
-            return PushNotificationPage(message: message);
-          },
-        ),
-      );
-    });
+
     PushNotificationService.instance.initialise();
     PushNotificationService.instance.getToken();
-    PushNotificationService.onMessageOpenedApp((message) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) {
-            return PushNotificationPage(message: message);
-          },
-        ),
-      );
-    });
   }
 
   getToken() async {
@@ -104,6 +86,31 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   @override
+  void initState() {
+    super.initState();
+    PushNotificationService.instance.getInitialMessage((message) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return PushNotificationPage(message: message);
+          },
+        ),
+      );
+    });
+    PushNotificationService.onMessageOpenedApp((message) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return PushNotificationPage(message: message);
+          },
+        ),
+      );
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -119,32 +126,44 @@ class _MyHomePageState extends State<MyHomePage> {
           // 底部导航栏Gif动画效果
           _buildListItem(
             context: context,
+            name: 'Navigation bottom bar',
             icon: Icons.assistant_navigation,
             page: const NavBottomGif(),
           ),
           // 头像随滚动移效果
           _buildListItem(
             context: context,
+            name: 'Custom Sliver Persistent Header',
             icon: Icons.aspect_ratio_rounded,
             page: const CustomSliverPersistentHeader(),
           ),
           // 自定义的滑动组件
           _buildListItem(
             context: context,
+            name: 'Slider',
             icon: Icons.short_text_sharp,
             page: const CustomSliderPage(),
           ),
           // 自定义的圆圈
           _buildListItem(
             context: context,
+            name: 'Custom circle',
             icon: Icons.vignette_rounded,
             page: const CustomCirclePage(),
           ),
           // google消息推送
           _buildListItem(
             context: context,
+            name: 'Firebase Messaging',
             icon: Icons.announcement_sharp,
             page: const PushNotificationPage(),
+          ),
+          // 生物识别
+          _buildListItem(
+            context: context,
+            name: 'Biometrics',
+            icon: Icons.fingerprint,
+            page: const LocalAuthPage(),
           ),
         ],
       ),
@@ -152,13 +171,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Column _buildListItem(
-      {required BuildContext context,
+      {required String name,
+      required BuildContext context,
       required IconData icon,
       required Widget page}) {
     return Column(
       children: [
         ListTile(
-          title: const Text('Navigation bottom bar'),
+          title: Text(name),
           leading: Icon(
             icon,
             color: const Color(0xff3FC0D8),
